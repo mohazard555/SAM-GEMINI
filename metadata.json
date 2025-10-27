@@ -1,0 +1,5 @@
+{
+  "name": "Copy of SAM GIMINI",
+  "description": "An elegant and simple AI image generator using the Gemini API. Users can generate images from text prompts and optional reference images.",
+  "requestFramePermissions": []
+}
