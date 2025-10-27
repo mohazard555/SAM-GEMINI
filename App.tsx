@@ -10,7 +10,7 @@ const App: React.FC = () => {
   const [uploadedImagePreview, setUploadedImagePreview] = useState<string | null>(null);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<React.ReactNode | null>(null);
   const [isMounted, setIsMounted] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -55,10 +55,16 @@ const App: React.FC = () => {
       return;
     }
 
-    // Explicitly check for the API key before proceeding.
-    // This prevents the app from using mock data and provides clear feedback.
     if (!process.env.API_KEY) {
-      setError('مفتاح API غير متوفر. يرجى التأكد من إعداده للمتابعة.');
+      setError(
+        <span>
+          مفتاح API غير متوفر. يرجى{' '}
+          <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="font-bold underline text-purple-700 hover:text-purple-900">
+            الحصول على مفتاح من Google AI Studio
+          </a>
+          {' '}وإعداده كمتغير بيئة في خدمة الاستضافة الخاصة بك.
+        </span>
+      );
       return;
     }
 
@@ -67,7 +73,6 @@ const App: React.FC = () => {
     setError(null);
 
     try {
-      // The API key exists, so we proceed with the real API call.
       const imageData = await generateImage(prompt, uploadedImage);
       setGeneratedImage(`data:image/png;base64,${imageData}`);
     } catch (err: any) {
@@ -157,7 +162,7 @@ const App: React.FC = () => {
               )}
             </button>
           </div>
-          {error && <p className="text-red-500 text-center mt-4">{error}</p>}
+          {error && <div className="text-red-500 text-center mt-4">{error}</div>}
         </section>
 
         {generatedImage && (
