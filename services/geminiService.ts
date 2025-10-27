@@ -45,14 +45,13 @@ export async function generateImage(
       throw new Error("Prompt and/or image must be provided.");
   }
 
-  // The 'contents' field should be an array of 'Content' objects.
-  // Each 'Content' object has a 'parts' array.
-  // For a single user turn with multiple parts (image + text),
-  // we wrap our 'parts' array inside a single 'Content' object within the main array.
-  // This was changed from `contents: { parts }` to `contents: [{ parts }]` to fix the issue.
+  // For a single-turn request with multiple parts (e.g., image and text),
+  // we provide a single 'Content' object with a 'parts' array.
+  // The structure `contents: { parts }` ensures the model treats the image
+  // and text as a single, cohesive prompt for more accurate results.
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash-image',
-    contents: [{ parts: parts }],
+    contents: { parts },
     config: {
       responseModalities: [Modality.IMAGE],
     },
