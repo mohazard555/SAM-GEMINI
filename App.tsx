@@ -54,39 +54,22 @@ const App: React.FC = () => {
       setError('يرجى كتابة وصف أو رفع صورة مرجعية.');
       return;
     }
+
+    // Explicitly check for the API key before proceeding.
+    // This prevents the app from using mock data and provides clear feedback.
+    if (!process.env.API_KEY) {
+      setError('مفتاح API غير متوفر. يرجى التأكد من إعداده للمتابعة.');
+      return;
+    }
+
     setIsLoading(true);
     setGeneratedImage(null);
     setError(null);
 
     try {
-      // Check for API key to decide whether to use the real service or a mock
-      const apiKey = process.env.API_KEY;
-
-      if (apiKey) {
-        // --- Real API Call ---
-        // This is where you would call the Gemini API.
-        // For this example, we've implemented it in services/geminiService.ts
-        const imageData = await generateImage(prompt, uploadedImage);
-        setGeneratedImage(`data:image/png;base64,${imageData}`);
-      } else {
-        // --- Mock Generation (if no API key) ---
-        // This simulates an API call for UI development and demonstration.
-        console.warn("API key not found. Using mock image generation.");
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        const mockImageUrl = `https://picsum.photos/seed/${encodeURIComponent(prompt || 'random')}/512/512`;
-        
-        // To make the mock image downloadable, we fetch it and convert to a data URL
-        const response = await fetch(mockImageUrl);
-        const blob = await response.blob();
-        const reader = new FileReader();
-        reader.readAsDataURL(blob);
-        reader.onloadend = () => {
-          setGeneratedImage(reader.result as string);
-        };
-        reader.onerror = () => {
-          throw new Error("Failed to load mock image.");
-        };
-      }
+      // The API key exists, so we proceed with the real API call.
+      const imageData = await generateImage(prompt, uploadedImage);
+      setGeneratedImage(`data:image/png;base64,${imageData}`);
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'حدث خطأ أثناء إنشاء الصورة. يرجى المحاولة مرة أخرى.');
